@@ -1,0 +1,39 @@
+from threading import Thread
+import cv2
+import webcam
+class webcam:
+    def __init__(self):
+        self.cap = cv2.VideoCapture(0)
+        self.currentframe = self.cap.read()
+        self.getpos = (0,0)
+        self.classhar = cv2.CascadeClassifier("/Users/PhamDucAnh/Downloads/haarcascade_frontalface_default.xml")
+
+    def getImagefromcam(self):
+        ret, self.currentframe = self.cap.read()
+        # convert rgb to gray
+        gray = cv2.cvtColor(self.currentframe, cv2.COLOR_RGB2GRAY)
+        # PHAT HIE NMAT
+        faces = self.classhar.detectMultiScale(gray)
+        # for x,y,w,h in faces:
+        #     cv2.rectangle(frame,(x,y),(x+w,y+h),(0,0,255),5)
+        # convert gray to binary
+        _n, binImg = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
+        # tim mat lon nhat
+        x_facemax = 0
+        y_facemax = 0
+        w_facemax = 0
+        h_facemax = 0
+        for x, y, w, h in faces:
+            if w * h > w_facemax * h_facemax:
+                x_facemax = x
+                y_facemax = y
+                w_facemax = w
+                h_facemax = h
+
+        cv2.rectangle(self.currentframe, (x_facemax, y_facemax), (x_facemax + w_facemax, y_facemax + h_facemax), (0, 0, 255), 5)
+
+        cv2.imshow("Videowebcam",self.currentframe)
+        cv2.waitKey(30)
+    def update(self):
+        Thread(None,self.getImagefromcam).start()
+
